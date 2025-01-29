@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Liga de Voleibol</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="watermark-container">
+        <div class="container">
+            <h1>Gestor de Liga de Voleibol</h1>
+
+            <div class="league-selection">
+                <h2>Seleccionar/Crear Liga</h2>
+                <label for="leagueSelect">Liga:</label>
+                <select id="leagueSelect"></select>
+                <button id="deleteLeagueButton">Eliminar Liga</button>
+                <input type="text" id="newLeagueName" placeholder="Nombre de la nueva liga">
+                <button id="createLeagueButton">Crear Liga</button>
+            </div>
+
+            <div class="competition-type">
+                <h2>Tipo de Competición</h2>
+                <label for="competitionSelect">Sistema de Competición:</label>
+                <select id="competitionSelect">
+                    <option value="roundRobin">Ronda por Turnos</option>
+                    <option value="singleElimination">Eliminación Simple</option>
+                    <option value="doubleElimination">Doble Eliminación</option>
+                     <option value="divisionalPlay">Juego Divisional</option>
+                </select>
+            </div>
+
+            <div class="form-container">
+                <h2>Añadir Equipos</h2>
+                <input type="text" id="teamNameInput" placeholder="Nombre del equipo">
+                <button id="addTeamButton">Añadir Equipo</button>
+            </div>
+
+            <div class="teams-container">
+                <h2>Equipos</h2>
+                <ul id="teamsList">
+                    <!-- Los equipos se listarán aquí dinámicamente -->
+                </ul>
+            </div>
+
+             <div class="schedule-container">
+                <h2>Calendario</h2>
+                <button id="generateScheduleButton">Generar Calendario</button>
+                <div id="scheduleDisplay">
+                    <!-- Aquí se mostrará el calendario de partidos -->
+                </div>
+            </div>
+
+            <div class="match-container">
+                <h2>Registrar Partido</h2>
+                <label for="matchSelect">Partido:</label>
+                <select id="matchSelect"></select>
+
+                <label for="matchDate">Fecha del partido:</label>
+                <input type="date" id="matchDate">
+                <label for="matchStatus">Estado:</label>
+                <select id="matchStatus">
+                    <option value="pending">Pendiente</option>
+                    <option value="played">Jugado</option>
+                    <option value="suspended">Suspendido</option>
+                </select>
+                <div id="scoreInputs">
+                </div>
+                <button id="addSetButton">Añadir Set</button>
+                <button id="saveMatchButton">Guardar Partido</button>
+            </div>
+
+             <div class="results-container">
+                <h2>Resultados</h2>
+                <table id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>Equipo</th>
+                            <th>Partidos Jugados</th>
+                            <th>Victorias</th>
+                            <th>Derrotas</th>
+                            <th>Sets</th>
+                             <th>Puntos</th>
+                             <th>Resultados</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Resultados dinamicos -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

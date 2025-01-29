@@ -1,0 +1,263 @@
+/* Estilos generales del body */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Contenedor de la marca de agua */
+.watermark-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+     overflow: hidden; /* Clip watermark to container's bounds */
+}
+
+/* Estilos de la marca de agua */
+.watermark-container::before {
+    content: "C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-80deg);
+    z-index: 10;
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    font-size: 8em;
+    color: rgba(0, 0, 0, 0.1);
+    line-height: 1.5em;
+    display: inline-block;
+}
+
+
+/* Contenedor principal de la aplicación */
+.container {
+    width: 100%;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+    box-sizing: border-box;
+}
+
+h1,
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.league-selection,
+.competition-type,
+.form-container,
+.match-container,
+.results-container,
+.teams-container,
+.schedule-container {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+input[type="text"],
+select,
+input[type="date"] {
+    display: block;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: calc(100% - 22px);
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #4cae4c;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.score-input {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.score-input input {
+    margin-right: 5px;
+    width: 50px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f0f0f0;
+}
+
+.match-status-indicator {
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: white;
+    font-size: 0.8em;
+    margin-left: 5px;
+}
+
+.match-status-pending {
+    background-color: green;
+}
+
+.match-status-played {
+    background-color: red;
+}
+
+.match-status-suspended {
+    background-color: yellow;
+    color: #333;
+}
+
+.schedule-match-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.schedule-match-container p {
+    margin: 0;
+    flex-grow: 1;
+}
+
+.schedule-match-container .match-status-indicator {
+    flex-shrink: 0;
+}
+
+.schedule-match-container .match-date {
+    font-size: 0.8em;
+    color: #555;
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+.match-date-input {
+    padding: 4px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: auto;
+    font-size: 0.8em;
+    margin-left: 5px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    height: 25px;
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.schedule-table th,
+.schedule-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.schedule-table th {
+    background-color: #f0f0f0;
+}
+
+.schedule-table input[type="date"] {
+    width: auto;
+    box-sizing: border-box;
+}
+
+.schedule-table select {
+    width: auto;
+    box-sizing: border-box;
+}
+
+.schedule-table .match-status-pending {
+    background-color: green;
+    color: white;
+    padding: 2px 5px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.schedule-table .match-status-played {
+    background-color: red;
+    color: white;
+    padding: 2px 5px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.schedule-table .match-status-suspended {
+    background-color: yellow;
+    color: #333;
+    padding: 2px 5px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.delete-team-button {
+    margin-left: 10px;
+    background-color: #d9534f;
+    color: white;
+}
+
+.delete-team-button:hover {
+    background-color: #c9302c;
+}
+
+@media (max-width: 600px) {
+    .container {
+        width: 95%;
+    }
+}
