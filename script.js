@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const deleteLeagueButton = document.getElementById('deleteLeagueButton');
     const exportButton = document.getElementById('exportButton');
 
-
     // App state variables
     let leagues = {};
     let currentLeague = null;
@@ -63,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load data for a specific league
     function loadLeagueData(leagueName) {
-         currentLeague = leagues[leagueName];
+        currentLeague = leagues[leagueName];
         if (!currentLeague) {
             currentLeague = { teams: [], matches: [], schedule: [], results: [], competitionType: "roundRobin", matchInfo: {} };
             leagues[leagueName] = currentLeague;
@@ -85,8 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
         displayMatchResults();
     }
 
-
-     // Update the team list in the UI
+    // Update the team list in the UI
     function updateTeamList() {
         teamsList.innerHTML = '';
         if (!currentLeague) {
@@ -117,15 +115,15 @@ document.addEventListener('DOMContentLoaded', function() {
         saveLeagues();
     }
 
-     // Update the match select dropdown
+    // Update the match select dropdown
     function updateMatchSelect() {
         matchSelect.innerHTML = '<option value="">Selecciona un partido</option>';
         if (!currentLeague || !currentLeague.schedule) {
             return;
         }
 
-         currentLeague.schedule.forEach((round, roundIndex) => {
-             if (Array.isArray(round)) {
+        currentLeague.schedule.forEach((round, roundIndex) => {
+            if (Array.isArray(round)) {
                 round.forEach((match, matchIndex) => {
                     const matchId = `${roundIndex}-${matchIndex}`;
                     const matchStatus = currentLeague.matchInfo[matchId]?.status || 'Pendiente';
@@ -138,9 +136,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             } else if (typeof round === 'object' && round !== null && round.hasOwnProperty('teamA') && round.hasOwnProperty('teamB')) {
                 const matchId = `${roundIndex}`;
-                 const matchStatus = currentLeague.matchInfo[matchId]?.status || 'Pendiente';
-                 if(!currentLeague.matchInfo[matchId] || currentLeague.matchInfo[matchId].status !== 'played'){
-                   const option = document.createElement('option');
+                const matchStatus = currentLeague.matchInfo[matchId]?.status || 'Pendiente';
+                if(!currentLeague.matchInfo[matchId] || currentLeague.matchInfo[matchId].status !== 'played'){
+                    const option = document.createElement('option');
                     option.value = `${roundIndex}`;
                     option.textContent = `Final: ${round.teamA?.name || 'Descansa'} vs ${round.teamB?.name || 'Descansa'} (${matchStatus})`;
                     matchSelect.appendChild(option);
@@ -161,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('El nombre de la liga solo puede contener letras, números y espacios.');
             return;
         }
-         if (leagues[leagueName]) {
+        if (leagues[leagueName]) {
             alert("Ya existe una liga con este nombre");
             return;
         }
@@ -199,30 +197,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Event listener for competition type change
     competitionSelect.addEventListener('change', function () {
-         if (currentLeague) {
+        if (currentLeague) {
             currentLeague.competitionType = competitionSelect.value;
-             currentLeague.schedule = [];
-             displaySchedule();
-             updateMatchSelect();
+            currentLeague.schedule = [];
+            displaySchedule();
+            updateMatchSelect();
             saveLeagues();
         }
     });
 
     // Event listener for add team button
     addTeamButton.addEventListener('click', function () {
-         if (!currentLeague) {
+        if (!currentLeague) {
             alert('Por favor, crea o selecciona una liga primero');
             return;
         }
         const teamName = teamNameInput.value.trim();
-          if (!teamName){
+        if (!teamName){
             alert('Por favor, introduce un nombre para el equipo');
             return;
         }
 
         if (!/^[a-zA-Z0-9\s]+$/.test(teamName)){
             alert('El nombre del equipo solo puede contener letras, números y espacios.');
-           return;
+            return;
         }
         const newTeam = { name: teamName, wins: 0, losses: 0, setsWon: 0, pointsWon: 0};
         currentLeague.teams.push(newTeam);
@@ -237,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Por favor, crea o selecciona una liga primero');
             return;
         }
-         if (currentLeague.teams.length < 2) {
+        if (currentLeague.teams.length < 2) {
             alert('Se necesitan al menos 2 equipos para generar el calendario');
             return;
         }
@@ -247,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
         saveLeagues();
     });
 
-     // Function to generate the schedule
+    // Function to generate the schedule
     function generateSchedule(teams, competitionType) {
         let schedule;
         switch (competitionType) {
@@ -259,18 +257,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
             case 'doubleElimination':
                 schedule = createDoubleEliminationSchedule(teams);
-                 break;
+                break;
             case 'divisionalPlay':
                 schedule = createDivisionalPlaySchedule(teams);
                 break;
             default:
                 schedule = createRoundRobinSchedule(teams);
         }
-         schedule.forEach((round, roundIndex) => {
+        schedule.forEach((round, roundIndex) => {
             if (Array.isArray(round)) {
-                 round.forEach((match, matchIndex) => {
+                round.forEach((match, matchIndex) => {
                     const matchId = `${roundIndex}-${matchIndex}`;
-                     const matchDate = new Date();
+                    const matchDate = new Date();
                     matchDate.setDate(matchDate.getDate() + (roundIndex * 7));
                     const formattedDate = matchDate.toISOString().split('T')[0];
                     if (!currentLeague.matchInfo[matchId]){
@@ -280,21 +278,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
             } else if (typeof round === 'object' && round !== null && round.hasOwnProperty('teamA') && round.hasOwnProperty('teamB')) {
-               const matchId = `${roundIndex}`;
+                const matchId = `${roundIndex}`;
                 const matchDate = new Date();
                 matchDate.setDate(matchDate.getDate() + (roundIndex * 7));
                 const formattedDate = matchDate.toISOString().split('T')[0];
-                 if (!currentLeague.matchInfo[matchId]){
+                if (!currentLeague.matchInfo[matchId]){
                     currentLeague.matchInfo[matchId] = { status: 'pending', date: formattedDate };
                 } else {
                     currentLeague.matchInfo[matchId].date = formattedDate;
                 }
             }
         });
-         return schedule;
+        return schedule;
     }
 
-     // Function to create round robin schedule
+    // Function to create round robin schedule
     function createRoundRobinSchedule(teams) {
         const numberOfTeams = teams.length;
         const numberOfRounds = numberOfTeams - 1;
@@ -306,10 +304,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const teamA = teams[i];
                 const teamB = teams[numberOfTeams - 1 - i];
                 if (teamA && teamB) {
-                     if (teamA !== teamB) {
-                       roundMatches.push({ teamA: teamA, teamB: teamB });
-                   } else {
-                       roundMatches.push({ teamA: teamA, teamB: null });
+                    if (teamA !== teamB) {
+                        roundMatches.push({ teamA: teamA, teamB: teamB });
+                    } else {
+                        roundMatches.push({ teamA: teamA, teamB: null });
                     }
                 } else if (teamA) {
                     roundMatches.push({ teamA: teamA, teamB: null });
@@ -321,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return schedule;
     }
 
-      // Function to create single elimination schedule
+    // Function to create single elimination schedule
     function createSingleEliminationSchedule(teams) {
         const numberOfTeams = teams.length;
         const schedule = [];
@@ -329,36 +327,36 @@ document.addEventListener('DOMContentLoaded', function() {
             return schedule;
         }
         let tempTeams = [...teams];
-         while (tempTeams.length > 1) {
+        while (tempTeams.length > 1) {
             const matches = [];
             while (tempTeams.length > 0) {
                 const teamA = tempTeams.shift();
                 const teamB = tempTeams.shift();
-               if (teamB) {
+                if (teamB) {
                     matches.push({ teamA, teamB });
                 } else {
-                     matches.push({ teamA: teamA, teamB: null });
+                    matches.push({ teamA: teamA, teamB: null });
                 }
-           }
+            }
             schedule.push(matches);
-           tempTeams = matches.filter(match => match.teamB).map(match => match.teamA);
+            tempTeams = matches.filter(match => match.teamB).map(match => match.teamA);
         }
         return schedule;
     }
 
-     // Function to create double elimination schedule
-     function createDoubleEliminationSchedule(teams) {
+    // Function to create double elimination schedule
+    function createDoubleEliminationSchedule(teams) {
         const numberOfTeams = teams.length;
         const schedule = [];
-         if (numberOfTeams < 2) {
+        if (numberOfTeams < 2) {
             return schedule;
         }
-         const winnersBracket = [];
+        const winnersBracket = [];
         let losersBracket = [];
         let tempTeams = [...teams];
-         while (tempTeams.length > 1) {
-             const matches = [];
-           while (tempTeams.length > 0) {
+        while (tempTeams.length > 1) {
+            const matches = [];
+            while (tempTeams.length > 0) {
                 const teamA = tempTeams.shift();
                 const teamB = tempTeams.shift();
                 if (teamB) {
@@ -370,23 +368,24 @@ document.addEventListener('DOMContentLoaded', function() {
             winnersBracket.push(matches);
             tempTeams = matches.filter(match => match.teamB).map(match => match.teamA);
         }
-          losersBracket.push(winnersBracket[0].filter(match => match.teamB).map(match => match.teamB).reverse());
+        losersBracket.push(winnersBracket[0].filter(match => match.teamB).map(match => match.teamB).reverse());
         let losersCurrentRound = losersBracket[0];
         while (losersCurrentRound.length > 1) {
             const losersMatches = [];
             while (losersCurrentRound.length > 0) {
                 const teamA = losersCurrentRound.shift();
                 const teamB = losersCurrentRound.shift();
-                 losersMatches.push({ teamA, teamB });
+                losersMatches.push({ teamA, teamB });
             }
-           losersBracket.push(losersMatches);
-           losersCurrentRound = losersMatches.filter(match => match.teamB).map(match => match.teamA);
+            losersBracket.push(losersMatches);
+            losersCurrentRound = losersMatches.filter(match => match.teamB).map(match => match.teamA);
         }
-       schedule.push(...winnersBracket);
-       schedule.push(...losersBracket);
+        schedule.push(...winnersBracket);
+        schedule.push(...losersBracket);
         return schedule;
     }
-      // Function to create divisional play schedule
+
+    // Function to create divisional play schedule
     function createDivisionalPlaySchedule(teams) {
         const numberOfTeams = teams.length;
         const schedule = [];
@@ -394,32 +393,32 @@ document.addEventListener('DOMContentLoaded', function() {
             return schedule;
         }
 
-       const divisions = Math.ceil(numberOfTeams / 2);
-       const divisionTeams = [];
-       for (let i = 0; i < divisions; i++) {
+        const divisions = Math.ceil(numberOfTeams / 2);
+        const divisionTeams = [];
+        for (let i = 0; i < divisions; i++) {
             divisionTeams.push([]);
         }
 
         teams.forEach((team, index) => {
-             divisionTeams[index % divisions].push(team);
-       });
+            divisionTeams[index % divisions].push(team);
+        });
 
         divisionTeams.forEach((division, index) => {
             const divisionSchedule = createRoundRobinSchedule(division);
-           schedule.push(...divisionSchedule.map(round => {
-               return round;
+            schedule.push(...divisionSchedule.map(round => {
+                return round;
             }));
         });
         const finalMatch = {
             teamA: divisionTeams[0][0],
             teamB: divisionTeams[divisionTeams.length - 1][0]
         };
-       schedule.push(finalMatch);
+        schedule.push(finalMatch);
         return schedule;
     }
 
-   // Display the schedule in the UI
-     function displaySchedule() {
+    // Display the schedule in the UI
+    function displaySchedule() {
         scheduleDisplay.innerHTML = '';
         if (!currentLeague || !currentLeague.schedule) {
             return;
@@ -435,32 +434,32 @@ document.addEventListener('DOMContentLoaded', function() {
             <th>Equipo B</th>
             <th>Fecha</th>
             <th>Estado</th>
-         `;
+        `;
         thead.appendChild(headerRow);
         table.appendChild(thead);
         const tbody = document.createElement('tbody');
         currentLeague.schedule.forEach((round, roundIndex) => {
-             if (Array.isArray(round)) {
+            if (Array.isArray(round)) {
                 round.forEach(match => {
                     const row = document.createElement('tr');
                     const matchId = `${roundIndex}-${currentLeague.schedule[roundIndex].indexOf(match)}`;
                     const matchStatus = currentLeague.matchInfo[matchId].status;
-                     const matchDate = currentLeague.matchInfo[matchId].date;
+                    const matchDate = currentLeague.matchInfo[matchId].date;
                     row.innerHTML = `
-                         <td>Ronda ${roundIndex + 1}</td>
+                        <td>Ronda ${roundIndex + 1}</td>
                         <td>${match.teamA?.name || 'Descansa'}</td>
                         <td>${match.teamB?.name || 'Descansa'}</td>
-                         <td><input type="date" class="match-date-input" value="${matchDate}" data-match-id="${matchId}"></td>
-                         <td>
+                        <td><input type="date" class="match-date-input" value="${matchDate}" data-match-id="${matchId}"></td>
+                        <td>
                             <span class="match-status-indicator ${getStatusClass(matchStatus)}">
                                 ${matchStatus.toUpperCase()}
                             </span>
                             <select class="match-status-select" data-match-id="${matchId}">
-                                 <option value="pending" ${matchStatus === 'pending' ? 'selected' : ''}>Pendiente</option>
+                                <option value="pending" ${matchStatus === 'pending' ? 'selected' : ''}>Pendiente</option>
                                 <option value="played" ${matchStatus === 'played' ? 'selected' : ''}>Jugado</option>
-                                 <option value="suspended" ${matchStatus === 'suspended' ? 'selected' : ''}>Suspendido</option>
+                                <option value="suspended" ${matchStatus === 'suspended' ? 'selected' : ''}>Suspendido</option>
                             </select>
-                       </td>
+                        </td>
                     `;
                     tbody.appendChild(row);
                 });
@@ -468,47 +467,47 @@ document.addEventListener('DOMContentLoaded', function() {
                 const row = document.createElement('tr');
                 const matchId = `${roundIndex}`;
                 const matchStatus = currentLeague.matchInfo[matchId].status;
-                 const matchDate = currentLeague.matchInfo[matchId].date;
+                const matchDate = currentLeague.matchInfo[matchId].date;
 
                 row.innerHTML = `
-                         <td>Final</td>
-                        <td>${round.teamA?.name || 'Descansa'}</td>
-                        <td>${round.teamB?.name || 'Descansa'}</td>
-                        <td><input type="date" class="match-date-input" value="${matchDate}" data-match-id="${matchId}"></td>
-                         <td>
-                             <span class="match-status-indicator ${getStatusClass(matchStatus)}">
-                                 ${matchStatus.toUpperCase()}
-                             </span>
-                             <select class="match-status-select" data-match-id="${matchId}">
-                                 <option value="pending" ${matchStatus === 'pending' ? 'selected' : ''}>Pendiente</option>
-                                <option value="played" ${matchStatus === 'played' ? 'selected' : ''}>Jugado</option>
-                                 <option value="suspended" ${matchStatus === 'suspended' ? 'selected' : ''}>Suspendido</option>
-                             </select>
-                         </td>
-                    `;
-               tbody.appendChild(row);
-           }
+                    <td>Final</td>
+                    <td>${round.teamA?.name || 'Descansa'}</td>
+                    <td>${round.teamB?.name || 'Descansa'}</td>
+                    <td><input type="date" class="match-date-input" value="${matchDate}" data-match-id="${matchId}"></td>
+                    <td>
+                        <span class="match-status-indicator ${getStatusClass(matchStatus)}">
+                            ${matchStatus.toUpperCase()}
+                        </span>
+                        <select class="match-status-select" data-match-id="${matchId}">
+                            <option value="pending" ${matchStatus === 'pending' ? 'selected' : ''}>Pendiente</option>
+                            <option value="played" ${matchStatus === 'played' ? 'selected' : ''}>Jugado</option>
+                            <option value="suspended" ${matchStatus === 'suspended' ? 'selected' : ''}>Suspendido</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
         });
 
         table.appendChild(tbody);
         scheduleDisplay.appendChild(table);
 
-         // Event listeners for date and status changes
+        // Event listeners for date and status changes
         scheduleDisplay.querySelectorAll('.match-date-input').forEach(input => {
             input.addEventListener('change', (event) => {
                 const matchId = event.target.dataset.matchId;
-                 currentLeague.matchInfo[matchId].date = event.target.value;
+                currentLeague.matchInfo[matchId].date = event.target.value;
                 displaySchedule();
-                 updateMatchSelect();
+                updateMatchSelect();
                 saveLeagues();
             });
         });
         scheduleDisplay.querySelectorAll('.match-status-select').forEach(select => {
             select.addEventListener('change', (event) => {
                 const matchId = event.target.dataset.matchId;
-                 currentLeague.matchInfo[matchId].status = event.target.value;
-                 displaySchedule();
-                 updateMatchSelect();
+                currentLeague.matchInfo[matchId].status = event.target.value;
+                displaySchedule();
+                updateMatchSelect();
                 saveLeagues();
             });
         });
@@ -519,16 +518,16 @@ document.addEventListener('DOMContentLoaded', function() {
         switch (status) {
             case 'pending':
                 return 'match-status-pending';
-           case 'played':
+            case 'played':
                 return 'match-status-played';
-             case 'suspended':
+            case 'suspended':
                 return 'match-status-suspended';
-           default:
+            default:
                 return '';
         }
     }
 
-     // Event listener for add set button
+    // Event listener for add set button
     addSetButton.addEventListener('click', function () {
         const scoreInputDiv = document.createElement('div');
         scoreInputDiv.classList.add('score-input');
@@ -545,7 +544,6 @@ document.addEventListener('DOMContentLoaded', function() {
         scoreInputDiv.appendChild(scoreInputB);
         scoreInputs.appendChild(scoreInputDiv);
     });
-
 
     // Function to get match result
     function getMatchResult(match) {
@@ -565,78 +563,76 @@ document.addEventListener('DOMContentLoaded', function() {
         return { teamAWins, teamBWins, teamAPoints, teamBPoints };
     }
 
-
-   // Event listener for the save match button
+    // Event listener for the save match button
     saveMatchButton.addEventListener('click', function () {
         const matchValue = matchSelect.value;
-         if (!matchValue) {
+        if (!matchValue) {
             alert('Selecciona un partido válido.');
-           return;
+            return;
         }
         const [roundIndex, matchIndex] = matchValue.split('-').map(Number);
-       let selectedMatch;
-         if (Array.isArray(currentLeague.schedule[roundIndex])) {
-           selectedMatch = currentLeague.schedule[roundIndex][matchIndex];
+        let selectedMatch;
+        if (Array.isArray(currentLeague.schedule[roundIndex])) {
+            selectedMatch = currentLeague.schedule[roundIndex][matchIndex];
         } else {
             selectedMatch = currentLeague.schedule[roundIndex];
         }
         const sets = [];
         let allSetsValid = true;
-         scoreInputs.querySelectorAll('.score-input').forEach(setElement => {
+        scoreInputs.querySelectorAll('.score-input').forEach(setElement => {
             const scoreA = parseInt(setElement.querySelector('.score-input-a').value);
             const scoreB = parseInt(setElement.querySelector('.score-input-b').value);
 
-           if (isNaN(scoreA) || isNaN(scoreB)) {
+            if (isNaN(scoreA) || isNaN(scoreB)) {
                 alert('Ingresa puntajes válidos para cada set.');
                 allSetsValid = false;
                 return;
             }
-           sets.push({ scoreA, scoreB });
+            sets.push({ scoreA, scoreB });
         });
-         if (!allSetsValid) {
+        if (!allSetsValid) {
             return;
         }
-         if (sets.length === 0) {
-             alert('Añade al menos un set');
-             return;
+        if (sets.length === 0) {
+            alert('Añade al menos un set');
+            return;
         }
-       const matchResult = {
-             teamA: selectedMatch.teamA,
+        const matchResult = {
+            teamA: selectedMatch.teamA,
             teamB: selectedMatch.teamB,
-           sets: sets
+            sets: sets
         };
-          const existingMatchIndex = currentLeague.results.findIndex(
+        const existingMatchIndex = currentLeague.results.findIndex(
             result => result.teamA === selectedMatch.teamA && result.teamB === selectedMatch.teamB
-       );
-       if (existingMatchIndex !== -1) {
+        );
+        if (existingMatchIndex !== -1) {
             currentLeague.results[existingMatchIndex] = matchResult;
         } else {
             currentLeague.results.push(matchResult);
-       }
+        }
         const matchId = Array.isArray(currentLeague.schedule[roundIndex]) ? `${roundIndex}-${matchIndex}` : `${roundIndex}`;
-          currentLeague.matchInfo[matchId] = {
-           date: matchDateInput.value,
-           status: matchStatusSelect.value
-      };
+        currentLeague.matchInfo[matchId] = {
+            date: matchDateInput.value,
+            status: matchStatusSelect.value
+        };
         displaySchedule();
         updateMatchResults();
         updateMatchSelect();
         scoreInputs.innerHTML = '';
-       matchDateInput.value = '';
+        matchDateInput.value = '';
         matchStatusSelect.value = 'pending';
-       saveLeagues();
+        saveLeagues();
     });
-
 
     // Function to update team results
     function updateMatchResults() {
-         if (!currentLeague) return;
+        if (!currentLeague) return;
 
         // Reset all team stats
         currentLeague.teams.forEach(team => {
-           team.wins = 0;
+            team.wins = 0;
             team.losses = 0;
-           team.setsWon = 0;
+            team.setsWon = 0;
             team.pointsWon = 0;
         });
 
@@ -644,97 +640,96 @@ document.addEventListener('DOMContentLoaded', function() {
         currentLeague.results.forEach(match => {
             const { teamAWins, teamBWins, teamAPoints, teamBPoints } = getMatchResult(match);
 
-
             const teamA = currentLeague.teams.find(team => team.name === match.teamA.name);
             const teamB = currentLeague.teams.find(team => team.name === match.teamB.name);
 
-              if (teamA && teamB) {
-                  if(teamAWins > teamBWins) {
+            if (teamA && teamB) {
+                if(teamAWins > teamBWins) {
                     teamA.wins++;
                     teamB.losses++;
-                     teamA.setsWon += match.sets.length;
-                 } else if (teamBWins > teamAWins) {
+                    teamA.setsWon += match.sets.length;
+                } else if (teamBWins > teamAWins) {
                     teamB.wins++;
-                     teamA.losses++;
-                      teamB.setsWon += match.sets.length;
-                 }
-                  teamA.pointsWon += teamAPoints;
-                 teamB.pointsWon += teamBPoints;
-              }
-
+                    teamA.losses++;
+                    teamB.setsWon += match.sets.length;
+                }
+                teamA.pointsWon += teamAPoints;
+                teamB.pointsWon += teamBPoints;
+            }
         });
-         updateResultsTable();
+        updateResultsTable();
         displayMatchResults();
     }
 
     // Function to update the results table
-     function updateResultsTable() {
+    function updateResultsTable() {
         resultsTableBody.innerHTML = '';
-         if (!currentLeague) {
+        if (!currentLeague) {
             return;
         }
         currentLeague.teams.forEach(team => {
             const row = document.createElement('tr');
 
             const nameCell = document.createElement('td');
-             nameCell.textContent = team.name;
+            nameCell.textContent = team.name;
             row.appendChild(nameCell);
 
-           const playedCell = document.createElement('td');
+            const playedCell = document.createElement('td');
             playedCell.textContent = team.wins + team.losses;
             row.appendChild(playedCell);
 
-           const winCell = document.createElement('td');
-           winCell.textContent = team.wins;
-           row.appendChild(winCell);
+            const winCell = document.createElement('td');
+            winCell.textContent = team.wins;
+            row.appendChild(winCell);
 
-           const loseCell = document.createElement('td');
-           loseCell.textContent = team.losses;
+            const loseCell = document.createElement('td');
+            loseCell.textContent = team.losses;
             row.appendChild(loseCell);
 
             const setsCell = document.createElement('td');
-           setsCell.textContent = team.setsWon;
-           row.appendChild(setsCell);
+            setsCell.textContent = team.setsWon;
+            row.appendChild(setsCell);
 
-           const pointsCell = document.createElement('td');
-           pointsCell.textContent = team.pointsWon;
-           row.appendChild(pointsCell);
+            const pointsCell = document.createElement('td');
+            pointsCell.textContent = team.pointsWon;
+            row.appendChild(pointsCell);
 
-           const resultsCell = document.createElement('td');
-           const matches = currentLeague.results.filter(match => match.teamA.name === team.name || match.teamB.name === team.name);
+            const resultsCell = document.createElement('td');
+            const matches = currentLeague.results.filter(match => match.teamA.name === team.name || match.teamB.name === team.name);
 
-           const resultsText = matches.map(match => {
+            const resultsText = matches.map(match => {
                 const { teamAWins, teamBWins } = getMatchResult(match);
 
                 if (match.teamA.name === team.name) {
-                     return `${teamAWins}-${teamBWins} (${match.sets.map(set => `${set.scoreA}-${set.scoreB}`).join(', ')})`;
-               } else if (match.teamB.name === team.name) {
-                     return `${teamBWins}-${teamAWins} (${match.sets.map(set => `${set.scoreB}-${set.scoreA}`).join(', ')})`;
+                    return `${teamAWins}-${teamBWins} (${match.sets.map(set => `${set.scoreA}-${set.scoreB}`).join(', ')})`;
+                } else if (match.teamB.name === team.name) {
+                    return `${teamBWins}-${teamAWins} (${match.sets.map(set => `${set.scoreB}-${set.scoreA}`).join(', ')})`;
                 }
             }).join(' <br> ');
-           resultsCell.innerHTML = resultsText;
-           row.appendChild(resultsCell);
+            resultsCell.innerHTML = resultsText;
+            row.appendChild(resultsCell);
             resultsTableBody.appendChild(row);
         });
     }
-     // Function to display the selected match result
+
+    // Function to display the selected match result
     function displayMatchResults() {
         scoreInputs.innerHTML = '';
         if (!currentLeague || !currentLeague.results) {
-           return;
+            return;
         }
-         const selectedMatchValue = matchSelect.value;
+        const selectedMatchValue = matchSelect.value;
         if (!selectedMatchValue) return;
         const [roundIndex, matchIndex] = selectedMatchValue.split('-').map(Number);
         let selectedMatch;
         if (Array.isArray(currentLeague.schedule[roundIndex])) {
-           selectedMatch = currentLeague.schedule[roundIndex][matchIndex];
-       } else {
-           selectedMatch = currentLeague.schedule[roundIndex];
-       }
+            selectedMatch = currentLeague.schedule[roundIndex][matchIndex];
+        } else {
+            selectedMatch = currentLeague.schedule[roundIndex];
+        }
 
-         const matchResult = currentLeague.results.find(
-           result => result.teamA.name === selectedMatch.teamA.name && result.teamB.name === selectedMatch.teamB.name
+        const matchResult = currentLeague.results.find(
+            result => result.teamA.name === selectedMatch.teamA.name && result.teamB.name === selectedMatch.teamB.name
         );
         if (matchResult) {
             matchResult.sets.forEach(set => {
@@ -742,82 +737,85 @@ document.addEventListener('DOMContentLoaded', function() {
                 scoreInputDiv.classList.add('score-input');
                 const scoreInputA = document.createElement('input');
                 scoreInputA.type = "number";
-               scoreInputA.placeholder = "Equipo A";
-               scoreInputA.classList.add('score-input-a');
-               scoreInputA.value = set.scoreA;
+                scoreInputA.placeholder = "Equipo A";
+                scoreInputA.classList.add('score-input-a');
+                scoreInputA.value = set.scoreA;
                 scoreInputDiv.appendChild(scoreInputA);
 
                 const scoreInputB = document.createElement('input');
                 scoreInputB.type = "number";
-               scoreInputB.placeholder = "Equipo B";
-              scoreInputB.classList.add('score-input-b');
-               scoreInputB.value = set.scoreB;
+                scoreInputB.placeholder = "Equipo B";
+                scoreInputB.classList.add('score-input-b');
+                scoreInputB.value = set.scoreB;
                 scoreInputDiv.appendChild(scoreInputB);
-               scoreInputs.appendChild(scoreInputDiv);
-           });
-      }
-       const matchId = Array.isArray(currentLeague.schedule[roundIndex]) ? `${roundIndex}-${currentLeague.schedule[roundIndex].indexOf(selectedMatch)}` : `${roundIndex}`;
-       if(currentLeague.matchInfo[matchId]){
-           matchDateInput.value = currentLeague.matchInfo[matchId].date;
-           matchStatusSelect.value = currentLeague.matchInfo[matchId].status;
-       } else {
+                scoreInputs.appendChild(scoreInputDiv);
+            });
+        }
+        const matchId = Array.isArray(currentLeague.schedule[roundIndex]) ? `${roundIndex}-${currentLeague.schedule[roundIndex].indexOf(selectedMatch)}` : `${roundIndex}`;
+        if(currentLeague.matchInfo[matchId]){
+            matchDateInput.value = currentLeague.matchInfo[matchId].date;
+            matchStatusSelect.value = currentLeague.matchInfo[matchId].status;
+        } else {
             matchDateInput.value = "";
-           matchStatusSelect.value = 'pending';
+            matchStatusSelect.value = 'pending';
         }
     }
+
     // Event listener for match select change
     matchSelect.addEventListener('change', displayMatchResults);
 
     // Event listener for the export button
     exportButton.addEventListener('click', function () {
-         if (!currentLeague || currentLeague.teams.length === 0) {
-             alert('No hay datos para exportar.');
-             return;
+        if (!currentLeague || currentLeague.teams.length === 0) {
+            alert('No hay datos para exportar.');
+            return;
         }
-          const dataToExport = currentLeague.teams.map(team => {
-              const matches = currentLeague.results.filter(match => match.teamA.name === team.name || match.teamB.name === team.name);
-               const resultsText = matches.map(match => {
-                    const { teamAWins, teamBWins } = getMatchResult(match);
-                    if (match.teamA.name === team.name) {
-                         return `${teamAWins}-${teamBWins} (${match.sets.map(set => `${set.scoreA}-${set.scoreB}`).join(', ')})`;
-                    } else if (match.teamB.name === team.name) {
-                         return `${teamBWins}-${teamAWins} (${match.sets.map(set => `${set.scoreB}-${set.scoreA}`).join(', ')})`;
-                    }
-               }).join(' | ');
-               return [
-                   team.name,
-                   team.wins + team.losses,
-                    team.wins,
-                    team.losses,
-                    team.setsWon,
-                   team.pointsWon,
-                    resultsText
-                ];
-         });
-      exportDataToGoogleSheets(dataToExport);
+        const dataToExport = currentLeague.teams.map(team => {
+            const matches = currentLeague.results.filter(match => match.teamA.name === team.name || match.teamB.name === team.name);
+            const resultsText = matches.map(match => {
+                const { teamAWins, teamBWins } = getMatchResult(match);
+                if (match.teamA.name === team.name) {
+                    return `${teamAWins}-${teamBWins} (${match.sets.map(set => `${set.scoreA}-${set.scoreB}`).join(', ')})`;
+                } else if (match.teamB.name === team.name) {
+                    return `${teamBWins}-${teamAWins} (${match.sets.map(set => `${set.scoreB}-${set.scoreA}`).join(', ')})`;
+                }
+            }).join(' | ');
+            return [
+                team.name,
+                team.wins + team.losses,
+                team.wins,
+                team.losses,
+                team.setsWon,
+                team.pointsWon,
+                resultsText
+            ];
+        });
+        exportDataToGoogleSheets(dataToExport);
     });
 
     // Function to export the data to google sheets
- async function exportDataToGoogleSheets(dataToExport) {
-      try {
-          const response = await fetch('https://script.google.com/macros/s/AKfycbzp6w0SHYRWDrQ6_umKRzcdccsQpJGotnNSDwVDx-9JDoyJ25YvB3z9HULKIk7Lvq_P/exec', {
-              method: 'POST',
+    async function exportDataToGoogleSheets(dataToExport) {
+        try {
+            const response = await fetch('https://script.google.com/macros/s/AKfycby3oARMFs5GzwlNKcEV20nR9FswNQ9gUBUdTb2jnkN3v8onJL7ltAIzZsojhvsQi-xH/exec', {
+                method: 'POST',
                 headers: {
-                      'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({data: dataToExport}),
-           });
-        if (!response.ok) {
-              throw new Error(`Error HTTP: ${response.status}`);
-         }
+            });
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
             const data = await response.json();
             console.log(data);
-         alert('Datos exportados correctamente a Google Sheets!');
-  } catch (error) {
-      console.error('Error al exportar datos:', error);
-       alert('Hubo un error al exportar los datos.');
-   }
-}
+            alert('Datos exportados correctamente a Google Sheets!');
+        } catch (error) {
+            console.error('Error al exportar datos:', error);
+            alert('Hubo un error al exportar los datos.');
+        }
+    }
+
     // Initialization: Update the league selector
     updateLeagueSelect();
 });
+
