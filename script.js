@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveMatchButton = document.getElementById('saveMatchButton');
     const resultsTableBody = document.querySelector('#resultsTable tbody');
     const deleteLeagueButton = document.getElementById('deleteLeagueButton');
+    const exportButton = document.getElementById('exportButton');
+
 
     // App state variables
     let leagues = {};
@@ -164,6 +166,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         leagues[leagueName] = { teams: [], matches: [], schedule: [], results: [], competitionType: "roundRobin", matchInfo: {} };
+        
+        // Carga la liga inmediatamente después de crearla
+        loadLeagueData(leagueName);
         updateLeagueSelect();
         newLeagueName.value = "";
         saveLeagues();
@@ -763,6 +768,69 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event listener for match select change
     matchSelect.addEventListener('change', displayMatchResults);
 
+    // Event listener for the export button
+    exportButton.addEventListener('click', function () {
+         if (!currentLeague || currentLeague.teams.length === 0) {
+             alert('No hay datos para exportar.');
+             return;
+        }
+          const dataToExport = currentLeague.teams.map(team => {
+              const matches = currentLeague.results.filter(match => match.teamA.name === team.name || match.teamB.name === team.name);
+               const resultsText = matches.map(match => {
+                    const { teamAWins, teamBWins } = getMatchResult(match);
+                    if (match.teamA.name === team.name) {
+                         return `${teamAWins}-${teamBWins} (${match.sets.map(set => `${set.scoreA}-${set.scoreB}`).join(', ')})`;
+                    } else if (match.teamB.name === team.name) {
+                         return `${teamBWins}-${teamAWins} (${match.sets.map(set => `${set.scoreB}-${set.scoreA}`).join(', ')})`;
+                    }
+               }).join(' | ');
+               return [
+                   team.name,
+                   team.wins + team.losses,
+                    team.wins,
+                    team.losses,
+                    team.setsWon,
+                   team.pointsWon,
+                    resultsText
+                ];
+         });
+      exportDataToGoogleSheets(dataToExport);
+    });
+
+    // Function to export the data to google sheets
+async function exportDataToGoogleSheets(dataToExport) {
+    try {
+        // Validar que dataToExport no esté vacío o sea undefined
+        if (!dataToExport || !Array.isArray(dataToExport) || dataToExport.length === 0) {
+            throw new Error('Los datos a exportar no son válidos o están vacíos.');
+        }
+
+        const response = await fetch('https://script.google.com/macros/s/AKfycbzp6w0SHYRWDrQ6_umKRzcdccsQpJGotnNSDwVDx-9JDoyJ25YvB3z9HULKIk7Lvq_P/exec', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ data: dataToExport }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Verificar si la respuesta del servidor es válida
+        if (!data || data.error) {
+            throw new Error(data.error || 'Respuesta no válida del servidor');
+        }
+
+        console.log(data);
+        alert('Datos exportados correctamente a Google Sheets!');
+    } catch (error) {
+        console.error('Error al exportar datos:', error);
+        alert(`Hubo un error al exportar los datos: ${error.message}`);
+    }
+}
     // Initialization: Update the league selector
     updateLeagueSelect();
 });
