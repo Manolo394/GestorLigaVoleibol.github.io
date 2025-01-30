@@ -21,7 +21,8 @@
 
     // App state variables
     let leagues = {};
-    let currentLeague = null;
+    let currentLeague = { teams: [], matches: [], schedule: [], results: [], competitionType: "roundRobin", matchInfo: {} };
+    let currentLeagueName = null;
 
     // Load leagues from localStorage
     function loadLeagues() {
@@ -62,11 +63,9 @@
 
     // Load data for a specific league
     function loadLeagueData(leagueName) {
-         currentLeague = leagues[leagueName];
-        if (!currentLeague) {
-            currentLeague = { teams: [], matches: [], schedule: [], results: [], competitionType: "roundRobin", matchInfo: {} };
-            leagues[leagueName] = currentLeague;
-        }
+        currentLeagueName = leagueName;
+         currentLeague = leagues[leagueName] || { teams: [], matches: [], schedule: [], results: [], competitionType: "roundRobin", matchInfo: {} };
+       
         competitionSelect.value = currentLeague.competitionType;
         updateTeamList();
         displaySchedule();
@@ -77,6 +76,7 @@
 
     function resetCurrentLeague() {
         currentLeague = { teams: [], matches: [], schedule: [], results: [], competitionType: "roundRobin", matchInfo: {} };
+        currentLeagueName = null;
         updateTeamList();
         displaySchedule();
         updateMatchSelect();
@@ -88,7 +88,7 @@
      // Update the team list in the UI
     function updateTeamList() {
         teamsList.innerHTML = '';
-        if (!currentLeague) {
+        if (!currentLeague || !currentLeague.teams) {
             return;
         }
 
@@ -149,7 +149,7 @@
     }
 
     // Event listener for the create league button
-    createLeagueButton.addEventListener('click', function () {
+     createLeagueButton.addEventListener('click', function () {
         const leagueName = newLeagueName.value.trim();
         if (!leagueName) {
             alert('Por favor, introduce un nombre para la liga');
@@ -165,11 +165,11 @@
             return;
         }
         leagues[leagueName] = { teams: [], matches: [], schedule: [], results: [], competitionType: "roundRobin", matchInfo: {} };
-        
-        // Carga la liga inmediatamente después de crearla
+
+        currentLeagueName = leagueName;
         loadLeagueData(leagueName);
         updateLeagueSelect();
-        newLeagueName.value = "";
+         newLeagueName.value = "";
         saveLeagues();
     });
 
@@ -198,12 +198,15 @@
 
     // Event listener for competition type change
     competitionSelect.addEventListener('change', function () {
-         if (currentLeague) {
+        if (currentLeague) {
             currentLeague.competitionType = competitionSelect.value;
-             currentLeague.schedule = [];
-             displaySchedule();
-             updateMatchSelect();
-            saveLeagues();
+            currentLeague.schedule = [];
+            displaySchedule();
+            updateMatchSelect();
+           if (currentLeagueName) {
+                leagues[currentLeagueName].competitionType = currentLeague.competitionType;
+                saveLeagues();
+           }
         }
     });
 
@@ -227,7 +230,10 @@
         currentLeague.teams.push(newTeam);
         updateTeamList();
         teamNameInput.value = "";
-        saveLeagues();
+         if (currentLeagueName) {
+            leagues[currentLeagueName].teams = currentLeague.teams;
+            saveLeagues();
+        }
     });
 
     // Event listener for generate schedule button
@@ -243,7 +249,11 @@
         currentLeague.schedule = generateSchedule(currentLeague.teams, currentLeague.competitionType);
         displaySchedule();
         updateMatchSelect();
-        saveLeagues();
+          if (currentLeagueName) {
+            leagues[currentLeagueName].schedule = currentLeague.schedule;
+              leagues[currentLeagueName].matchInfo = currentLeague.matchInfo;
+            saveLeagues();
+        }
     });
 
      // Function to generate the schedule
@@ -499,7 +509,10 @@
                  currentLeague.matchInfo[matchId].date = event.target.value;
                 displaySchedule();
                  updateMatchSelect();
-                saveLeagues();
+                  if (currentLeagueName) {
+                    leagues[currentLeagueName].matchInfo = currentLeague.matchInfo;
+                     saveLeagues();
+                 }
             });
         });
         scheduleDisplay.querySelectorAll('.match-status-select').forEach(select => {
@@ -508,7 +521,10 @@
                  currentLeague.matchInfo[matchId].status = event.target.value;
                  displaySchedule();
                  updateMatchSelect();
-                saveLeagues();
+                   if (currentLeagueName) {
+                    leagues[currentLeagueName].matchInfo = currentLeague.matchInfo;
+                     saveLeagues();
+                }
             });
         });
     }
@@ -623,7 +639,11 @@
         scoreInputs.innerHTML = '';
        matchDateInput.value = '';
         matchStatusSelect.value = 'pending';
-       saveLeagues();
+        if (currentLeagueName){
+          leagues[currentLeagueName].results = currentLeague.results;
+           leagues[currentLeagueName].matchInfo = currentLeague.matchInfo;
+          saveLeagues();
+        }
     });
 
 
@@ -816,18 +836,3 @@
             },
             body: JSON.stringify({ data: dataToExport }),
         });
-        if (!response.ok) {
-            const message = await response.text();
-            throw new Error(`HTTP error! status: ${response.status} message: ${message}`);
-        }
-        const data = await response.json();
-        console.log(data);
-        alert('Datos exportados correctamente a Google Sheets!');
-    } catch (error) {
-        console.error('Error al exportar datos:', error);
-        alert('Hubo un error al exportar los datos: ' + error.message);
-    }
-}
-    // Initialization: Update the league selector
-    updateLeagueSelect();
-});
