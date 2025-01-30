@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', function() {
     // DOM elements
     const leagueSelect = document.getElementById('leagueSelect');
     const newLeagueName = document.getElementById('newLeagueName');
@@ -16,13 +17,10 @@
     const saveMatchButton = document.getElementById('saveMatchButton');
     const resultsTableBody = document.querySelector('#resultsTable tbody');
     const deleteLeagueButton = document.getElementById('deleteLeagueButton');
-    const exportButton = document.getElementById('exportButton');
-
 
     // App state variables
     let leagues = {};
-    let currentLeague = { teams: [], matches: [], schedule: [], results: [], competitionType: "roundRobin", matchInfo: {} };
-    let currentLeagueName = null;
+    let currentLeague = null;
 
     // Load leagues from localStorage
     function loadLeagues() {
@@ -63,9 +61,11 @@
 
     // Load data for a specific league
     function loadLeagueData(leagueName) {
-        currentLeagueName = leagueName;
-         currentLeague = leagues[leagueName] || { teams: [], matches: [], schedule: [], results: [], competitionType: "roundRobin", matchInfo: {} };
-       
+         currentLeague = leagues[leagueName];
+        if (!currentLeague) {
+            currentLeague = { teams: [], matches: [], schedule: [], results: [], competitionType: "roundRobin", matchInfo: {} };
+            leagues[leagueName] = currentLeague;
+        }
         competitionSelect.value = currentLeague.competitionType;
         updateTeamList();
         displaySchedule();
@@ -76,7 +76,6 @@
 
     function resetCurrentLeague() {
         currentLeague = { teams: [], matches: [], schedule: [], results: [], competitionType: "roundRobin", matchInfo: {} };
-        currentLeagueName = null;
         updateTeamList();
         displaySchedule();
         updateMatchSelect();
@@ -88,7 +87,7 @@
      // Update the team list in the UI
     function updateTeamList() {
         teamsList.innerHTML = '';
-        if (!currentLeague || !currentLeague.teams) {
+        if (!currentLeague) {
             return;
         }
 
@@ -149,7 +148,7 @@
     }
 
     // Event listener for the create league button
-     createLeagueButton.addEventListener('click', function () {
+    createLeagueButton.addEventListener('click', function () {
         const leagueName = newLeagueName.value.trim();
         if (!leagueName) {
             alert('Por favor, introduce un nombre para la liga');
@@ -165,11 +164,8 @@
             return;
         }
         leagues[leagueName] = { teams: [], matches: [], schedule: [], results: [], competitionType: "roundRobin", matchInfo: {} };
-
-        currentLeagueName = leagueName;
-        loadLeagueData(leagueName);
         updateLeagueSelect();
-         newLeagueName.value = "";
+        newLeagueName.value = "";
         saveLeagues();
     });
 
@@ -198,15 +194,12 @@
 
     // Event listener for competition type change
     competitionSelect.addEventListener('change', function () {
-        if (currentLeague) {
+         if (currentLeague) {
             currentLeague.competitionType = competitionSelect.value;
-            currentLeague.schedule = [];
-            displaySchedule();
-            updateMatchSelect();
-           if (currentLeagueName) {
-                leagues[currentLeagueName].competitionType = currentLeague.competitionType;
-                saveLeagues();
-           }
+             currentLeague.schedule = [];
+             displaySchedule();
+             updateMatchSelect();
+            saveLeagues();
         }
     });
 
@@ -230,10 +223,7 @@
         currentLeague.teams.push(newTeam);
         updateTeamList();
         teamNameInput.value = "";
-         if (currentLeagueName) {
-            leagues[currentLeagueName].teams = currentLeague.teams;
-            saveLeagues();
-        }
+        saveLeagues();
     });
 
     // Event listener for generate schedule button
@@ -249,11 +239,7 @@
         currentLeague.schedule = generateSchedule(currentLeague.teams, currentLeague.competitionType);
         displaySchedule();
         updateMatchSelect();
-          if (currentLeagueName) {
-            leagues[currentLeagueName].schedule = currentLeague.schedule;
-              leagues[currentLeagueName].matchInfo = currentLeague.matchInfo;
-            saveLeagues();
-        }
+        saveLeagues();
     });
 
      // Function to generate the schedule
@@ -509,10 +495,7 @@
                  currentLeague.matchInfo[matchId].date = event.target.value;
                 displaySchedule();
                  updateMatchSelect();
-                  if (currentLeagueName) {
-                    leagues[currentLeagueName].matchInfo = currentLeague.matchInfo;
-                     saveLeagues();
-                 }
+                saveLeagues();
             });
         });
         scheduleDisplay.querySelectorAll('.match-status-select').forEach(select => {
@@ -521,10 +504,7 @@
                  currentLeague.matchInfo[matchId].status = event.target.value;
                  displaySchedule();
                  updateMatchSelect();
-                   if (currentLeagueName) {
-                    leagues[currentLeagueName].matchInfo = currentLeague.matchInfo;
-                     saveLeagues();
-                }
+                saveLeagues();
             });
         });
     }
@@ -639,11 +619,7 @@
         scoreInputs.innerHTML = '';
        matchDateInput.value = '';
         matchStatusSelect.value = 'pending';
-        if (currentLeagueName){
-          leagues[currentLeagueName].results = currentLeague.results;
-           leagues[currentLeagueName].matchInfo = currentLeague.matchInfo;
-          saveLeagues();
-        }
+       saveLeagues();
     });
 
 
@@ -787,52 +763,6 @@
     // Event listener for match select change
     matchSelect.addEventListener('change', displayMatchResults);
 
-   // Utility function for fetch requests with timeout
-    async function fetchDataWithTimeout(url, options, timeout = 5000) { // Timeout of 5 seconds
-        return Promise.race([
-            fetch(url, options),
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Timeout')), timeout)
-            )
-        ]);
-    }
-     // Event listener for the export button
-    exportButton.addEventListener('click', async function () {
-         if (!currentLeague || currentLeague.teams.length === 0) {
-             alert('No hay datos para exportar.');
-             return;
-        }
-          const dataToExport = currentLeague.teams.map(team => {
-              const matches = currentLeague.results.filter(match => match.teamA.name === team.name || match.teamB.name === team.name);
-               const resultsText = matches.map(match => {
-                    const { teamAWins, teamBWins } = getMatchResult(match);
-                    if (match.teamA.name === team.name) {
-                         return `${teamAWins}-${teamBWins} (${match.sets.map(set => `${set.scoreA}-${set.scoreB}`).join(', ')})`;
-                    } else if (match.teamB.name === team.name) {
-                         return `${teamBWins}-${teamAWins} (${match.sets.map(set => `${set.scoreB}-${set.scoreA}`).join(', ')})`;
-                    }
-               }).join(' | ');
-               return [
-                   team.name,
-                   team.wins + team.losses,
-                    team.wins,
-                    team.losses,
-                    team.setsWon,
-                   team.pointsWon,
-                    resultsText
-                ];
-         });
-      exportDataToGoogleSheets(dataToExport);
-    });
-
-
-    // Function to export the data to google sheets
-    async function exportDataToGoogleSheets(dataToExport) {
-    try {
-        const response = await fetchDataWithTimeout('https://script.google.com/macros/s/AKfycbzp6w0SHYRWDrQ6_umKRzcdccsQpJGotnNSDwVDx-9JDoyJ25YvB3z9HULKIk7Lvq_P/exec', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ data: dataToExport }),
-        });
+    // Initialization: Update the league selector
+    updateLeagueSelect();
+});
