@@ -1,4 +1,3 @@
-document.addEventListener('DOMContentLoaded', function() {
     // DOM elements
     const leagueSelect = document.getElementById('leagueSelect');
     const newLeagueName = document.getElementById('newLeagueName');
@@ -768,8 +767,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event listener for match select change
     matchSelect.addEventListener('change', displayMatchResults);
 
-    // Event listener for the export button
-    exportButton.addEventListener('click', function () {
+   // Utility function for fetch requests with timeout
+    async function fetchDataWithTimeout(url, options, timeout = 5000) { // Timeout of 5 seconds
+        return Promise.race([
+            fetch(url, options),
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Timeout')), timeout)
+            )
+        ]);
+    }
+     // Event listener for the export button
+    exportButton.addEventListener('click', async function () {
          if (!currentLeague || currentLeague.teams.length === 0) {
              alert('No hay datos para exportar.');
              return;
@@ -797,38 +805,27 @@ document.addEventListener('DOMContentLoaded', function() {
       exportDataToGoogleSheets(dataToExport);
     });
 
-    // Function to export the data to google sheets
-async function exportDataToGoogleSheets(dataToExport) {
-    try {
-        // Validar que dataToExport no esté vacío o sea undefined
-        if (!dataToExport || !Array.isArray(dataToExport) || dataToExport.length === 0) {
-            throw new Error('Los datos a exportar no son válidos o están vacíos.');
-        }
 
-        const response = await fetch('https://script.google.com/macros/s/AKfycbzp6w0SHYRWDrQ6_umKRzcdccsQpJGotnNSDwVDx-9JDoyJ25YvB3z9HULKIk7Lvq_P/exec', {
+    // Function to export the data to google sheets
+    async function exportDataToGoogleSheets(dataToExport) {
+    try {
+        const response = await fetchDataWithTimeout('https://script.google.com/macros/s/AKfycbzp6w0SHYRWDrQ6_umKRzcdccsQpJGotnNSDwVDx-9JDoyJ25YvB3z9HULKIk7Lvq_P/exec', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ data: dataToExport }),
         });
-
         if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status}`);
+            const message = await response.text();
+            throw new Error(`HTTP error! status: ${response.status} message: ${message}`);
         }
-
         const data = await response.json();
-
-        // Verificar si la respuesta del servidor es válida
-        if (!data || data.error) {
-            throw new Error(data.error || 'Respuesta no válida del servidor');
-        }
-
         console.log(data);
         alert('Datos exportados correctamente a Google Sheets!');
     } catch (error) {
         console.error('Error al exportar datos:', error);
-        alert(`Hubo un error al exportar los datos: ${error.message}`);
+        alert('Hubo un error al exportar los datos: ' + error.message);
     }
 }
     // Initialization: Update the league selector
