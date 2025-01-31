@@ -17,13 +17,71 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveMatchButton = document.getElementById('saveMatchButton');
     const resultsTableBody = document.querySelector('#resultsTable tbody');
     const deleteLeagueButton = document.getElementById('deleteLeagueButton');
-    // Boton de exportar a hoja de calculo
-    const exportButton = document.getElementById('exportButton');
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbynF-0Y2SGdiQ40Ma8B6tqRJhSrlpYCkWQsgxcpb0oT7TjgESWwWqJ_Ij41inlgZSb_/exec";
 
     // App state variables
     let leagues = {};
     let currentLeague = null;
+ 
+    // Función para enviar los datos a Google Sheets
+    async function sendDataToSheet(data) {
+         try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+             if (response.ok){
+                 const jsonResponse = await response.json();
+                console.log("Datos enviados correctamente:", jsonResponse);
+                return jsonResponse;
+             } else {
+                console.error("Error al enviar los datos:", response.status, response.statusText);
+             }
+            } catch (error) {
+            console.error("Error de red:", error);
+        }
+    }
 
+
+     // Event listener for the save match button
+    saveMatchButton.addEventListener('click', async function () {
+         // Existing code...
+
+         // Send data to google sheet
+            const dataToSend = {
+                 league: leagueSelect.value,
+                 competitionType: competitionSelect.value,
+                team: teamNameInput.value,
+                 date: matchDateInput.value,
+                 status: matchStatusSelect.value,
+                 teamA: selectedMatch?.teamA?.name || '',
+                 teamB: selectedMatch?.teamB?.name || '',
+                  sets: JSON.stringify(sets),
+                 result: "Pendiente"
+            };
+
+        const response = await sendDataToSheet(dataToSend);
+
+          if (response.result === "success") {
+               const matchId = Array.isArray(currentLeague.schedule[roundIndex]) ? `${roundIndex}-${matchIndex}` : `${roundIndex}`;
+                currentLeague.matchInfo[matchId] = {
+                date: matchDateInput.value,
+                status: matchStatusSelect.value
+             };
+              displaySchedule();
+            updateMatchResults();
+            updateMatchSelect();
+            scoreInputs.innerHTML = '';
+            matchDateInput.value = '';
+            matchStatusSelect.value = 'pending';
+            saveLeagues();
+          } else {
+             alert("Ha ocurrido un error al enviar los datos");
+         }
+      });
     // Load leagues from localStorage
     function loadLeagues() {
         try {
@@ -767,46 +825,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialization: Update the league selector
     updateLeagueSelect();
-
-    // Funcion de exportar a hoja de calculo
-    function exportDataToSheets() {
-        if (!currentLeague || !currentLeague.teams || currentLeague.teams.length === 0) {
-             alert('No hay datos para exportar.');
-            return;
-        }
-        const dataToExport = {
-            leagueName: leagueSelect.value,
-            competitionType: currentLeague.competitionType,
-           teams: currentLeague.teams,
-           schedule: currentLeague.schedule,
-            results: currentLeague.results,
-            matchInfo: currentLeague.matchInfo,
-        };
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwo6Jtf221eul1ohpz5xzYC0Tm4nEmGnbTrrnEKrrXCw4iKtK-011kZcsB5lOWnNP8-/exec'; // Reemplaza con la URL de tu script
-         fetch(scriptURL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dataToExport),
-        })
-        .then(response => response.json())
-       .then(data => {
-            if (data.status === 'success') {
-               alert('Datos exportados con éxito a la hoja de cálculo.');
-            } else {
-                 alert('Error al exportar datos: ' + data.message);
-            }
-       })
-        .catch((error) => {
-            console.error('Error:', error);
-             alert('Error al exportar datos. Por favor, intenta de nuevo.');
-       });
-    }
-
-        // Event listener for export button
-     exportButton.addEventListener('click', function () {
-            exportDataToSheets();
-       });
-
 });
