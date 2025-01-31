@@ -782,7 +782,7 @@ document.addEventListener('DOMContentLoaded', function() {
             results: currentLeague.results,
             matchInfo: currentLeague.matchInfo,
         };
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbz1RwYtwmEW40CYC6oMrOHKKU7s4xVT7uX7WkZfIFUV2pYNdWZWPmUpjpJJ-VXSs4RD/exec'; // Reemplaza con la URL de tu script
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxkwPrYtKMyojtXRGoq6y81tRCBG5D3z9y8Cq1UwqauGt37QiTH2mbBc2A39XsYtDKO/exec'; // Reemplaza con la URL de tu script
          fetch(scriptURL, {
             method: 'POST',
             headers: {
