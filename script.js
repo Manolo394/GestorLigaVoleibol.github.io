@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveMatchButton = document.getElementById('saveMatchButton');
     const resultsTableBody = document.querySelector('#resultsTable tbody');
     const deleteLeagueButton = document.getElementById('deleteLeagueButton');
+    // Boton de exportar a hoja de calculo
+    const exportButton = document.getElementById('exportButton');
 
     // App state variables
     let leagues = {};
@@ -83,7 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
         displayMatchResults();
     }
 
-    // Update the team list in the UI
+
+     // Update the team list in the UI
     function updateTeamList() {
         teamsList.innerHTML = '';
         if (!currentLeague) {
@@ -114,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         saveLeagues();
     }
 
-    // Update the match select dropdown
+     // Update the match select dropdown
     function updateMatchSelect() {
         matchSelect.innerHTML = '<option value="">Selecciona un partido</option>';
         if (!currentLeague || !currentLeague.schedule) {
@@ -241,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
         saveLeagues();
     });
 
-    // Function to generate the schedule
+     // Function to generate the schedule
     function generateSchedule(teams, competitionType) {
         let schedule;
         switch (competitionType) {
@@ -288,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
          return schedule;
     }
 
-    // Function to create round robin schedule
+     // Function to create round robin schedule
     function createRoundRobinSchedule(teams) {
         const numberOfTeams = teams.length;
         const numberOfRounds = numberOfTeams - 1;
@@ -315,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return schedule;
     }
 
-    // Function to create single elimination schedule
+      // Function to create single elimination schedule
     function createSingleEliminationSchedule(teams) {
         const numberOfTeams = teams.length;
         const schedule = [];
@@ -340,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return schedule;
     }
 
-    // Function to create double elimination schedule
+     // Function to create double elimination schedule
      function createDoubleEliminationSchedule(teams) {
         const numberOfTeams = teams.length;
         const schedule = [];
@@ -380,8 +383,7 @@ document.addEventListener('DOMContentLoaded', function() {
        schedule.push(...losersBracket);
         return schedule;
     }
-
-    // Function to create divisional play schedule
+      // Function to create divisional play schedule
     function createDivisionalPlaySchedule(teams) {
         const numberOfTeams = teams.length;
         const schedule = [];
@@ -413,7 +415,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return schedule;
     }
 
-    // Display the schedule in the UI
+   // Display the schedule in the UI
      function displaySchedule() {
         scheduleDisplay.innerHTML = '';
         if (!currentLeague || !currentLeague.schedule) {
@@ -523,7 +525,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Event listener for add set button
+     // Event listener for add set button
     addSetButton.addEventListener('click', function () {
         const scoreInputDiv = document.createElement('div');
         scoreInputDiv.classList.add('score-input');
@@ -540,6 +542,7 @@ document.addEventListener('DOMContentLoaded', function() {
         scoreInputDiv.appendChild(scoreInputB);
         scoreInputs.appendChild(scoreInputDiv);
     });
+
 
     // Function to get match result
     function getMatchResult(match) {
@@ -559,7 +562,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return { teamAWins, teamBWins, teamAPoints, teamBPoints };
     }
 
-    // Event listener for the save match button
+
+   // Event listener for the save match button
     saveMatchButton.addEventListener('click', function () {
         const matchValue = matchSelect.value;
          if (!matchValue) {
@@ -618,32 +622,8 @@ document.addEventListener('DOMContentLoaded', function() {
        matchDateInput.value = '';
         matchStatusSelect.value = 'pending';
        saveLeagues();
-
-        // Enviar datos a Google Sheets
-        const dataToSend = {
-            leagueName: currentLeague.name,
-            competitionType: currentLeague.competitionType,
-            teamName: selectedMatch.teamA.name + " vs " + selectedMatch.teamB.name,
-            matchDate: matchDateInput.value,
-            matchStatus: matchStatusSelect.value,
-            sets: JSON.stringify(sets)
-        };
-
-        fetch('https://script.google.com/macros/s/AKfycbyYDkIai4Z2GVLj53fhjvEYuV0g4BVShFIQLjUgfcyxnP7t3chlrZq19Wr_HGYGLBmw/exec', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataToSend)
-        })
-        .then(response => response.text())
-        .then(data => {
-            console.log('Datos enviados a Google Sheets:', data);
-        })
-        .catch(error => {
-            console.error('Error al enviar datos a Google Sheets:', error);
-        });
     });
+
 
     // Function to update team results
     function updateMatchResults() {
@@ -661,6 +641,7 @@ document.addEventListener('DOMContentLoaded', function() {
         currentLeague.results.forEach(match => {
             const { teamAWins, teamBWins, teamAPoints, teamBPoints } = getMatchResult(match);
 
+
             const teamA = currentLeague.teams.find(team => team.name === match.teamA.name);
             const teamB = currentLeague.teams.find(team => team.name === match.teamB.name);
 
@@ -677,6 +658,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   teamA.pointsWon += teamAPoints;
                  teamB.pointsWon += teamBPoints;
               }
+
         });
          updateResultsTable();
         displayMatchResults();
@@ -732,8 +714,7 @@ document.addEventListener('DOMContentLoaded', function() {
             resultsTableBody.appendChild(row);
         });
     }
-
-    // Function to display the selected match result
+     // Function to display the selected match result
     function displayMatchResults() {
         scoreInputs.innerHTML = '';
         if (!currentLeague || !currentLeague.results) {
@@ -781,10 +762,51 @@ document.addEventListener('DOMContentLoaded', function() {
            matchStatusSelect.value = 'pending';
         }
     }
-
     // Event listener for match select change
     matchSelect.addEventListener('change', displayMatchResults);
 
     // Initialization: Update the league selector
     updateLeagueSelect();
+
+    // Funcion de exportar a hoja de calculo
+    function exportDataToSheets() {
+        if (!currentLeague || !currentLeague.teams || currentLeague.teams.length === 0) {
+             alert('No hay datos para exportar.');
+            return;
+        }
+        const dataToExport = {
+            leagueName: leagueSelect.value,
+            competitionType: currentLeague.competitionType,
+           teams: currentLeague.teams,
+           schedule: currentLeague.schedule,
+            results: currentLeague.results,
+            matchInfo: currentLeague.matchInfo,
+        };
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbz1RwYtwmEW40CYC6oMrOHKKU7s4xVT7uX7WkZfIFUV2pYNdWZWPmUpjpJJ-VXSs4RD/exec'; // Reemplaza con la URL de tu script
+         fetch(scriptURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dataToExport),
+        })
+        .then(response => response.json())
+       .then(data => {
+            if (data.status === 'success') {
+               alert('Datos exportados con éxito a la hoja de cálculo.');
+            } else {
+                 alert('Error al exportar datos: ' + data.message);
+            }
+       })
+        .catch((error) => {
+            console.error('Error:', error);
+             alert('Error al exportar datos. Por favor, intenta de nuevo.');
+       });
+    }
+
+        // Event listener for export button
+     exportButton.addEventListener('click', function () {
+            exportDataToSheets();
+       });
+
 });
