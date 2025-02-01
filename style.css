@@ -1,3 +1,4 @@
+--- START OF FILE style.css ---
 /* Estilos generales del body */
 body {
     font-family: sans-serif;
@@ -26,7 +27,7 @@ body {
 
 /* Estilos de la marca de agua */
 .watermark-container::before {
-    content: "C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez";
+    content: "C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez C.V. Jerez";
     position: absolute;
     top: 50%;
     left: 50%;
