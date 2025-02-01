@@ -769,38 +769,30 @@ document.addEventListener('DOMContentLoaded', function() {
     matchSelect.addEventListener('change', displayMatchResults);
 
     // Event listener for export data button
-    exportDataButton.addEventListener('click', function() {
-        if (!currentLeague) {
-            alert('Por favor, selecciona una liga para exportar datos.');
-            return;
-        }
+exportDataButton.addEventListener('click', function() {
+    if (!currentLeague) {
+        alert('Por favor, selecciona una liga para exportar datos.');
+        return;
+    }
 
-        const dataToExport = {
-            leagueName: leagueSelect.value,
-            competitionType: currentLeague.competitionType,
-            teams: currentLeague.teams,
-            schedule: currentLeague.schedule,
-            matchInfo: currentLeague.matchInfo,
-            results: currentLeague.results
-        };
+    const dataToExport = { message: "Prueba de exportación simple", leagueName: leagueSelect.value }; // ¡Datos MUY simples!
 
-        fetch(appsScriptUrl, {
-            method: 'POST',
-            mode: 'no-cors', // Avoid CORS issues for simple requests
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataToExport)
-        })
-        .then(response => {
-            // Since mode is no-cors, response object will be opaque and limited
-             alert('Datos exportados a Google Sheet exitosamente (verifique la hoja de cálculo).');
-        })
-        .catch(error => {
-            console.error('Error al exportar datos:', error);
-            alert('Error al exportar datos a Google Sheet.');
-        });
+    fetch(appsScriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataToExport)
+    })
+    .then(response => {
+        alert('Datos exportados a Google Sheet exitosamente (verifique la hoja de cálculo).');
+    })
+    .catch(error => {
+        console.error('Error al exportar datos:', error);
+        alert('Error al exportar datos a Google Sheet.');
     });
+});
 
 
     // Initialization: Update the league selector
