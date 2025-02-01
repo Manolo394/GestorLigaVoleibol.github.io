@@ -776,6 +776,7 @@ exportDataButton.addEventListener('click', function() {
     }
 
     const dataToExport = { message: "Prueba de exportación simple", leagueName: leagueSelect.value }; // ¡Datos MUY simples!
+    console.log("exportDataButton clicked. Data to send:", dataToExport); // **REGISTRO ANTES DE FETCH**
 
     fetch(appsScriptUrl, {
         method: 'POST',
@@ -786,12 +787,15 @@ exportDataButton.addEventListener('click', function() {
         body: JSON.stringify(dataToExport)
     })
     .then(response => {
+        console.log("fetch response:", response); // **REGISTRO DE LA RESPUESTA**
         alert('Datos exportados a Google Sheet exitosamente (verifique la hoja de cálculo).');
     })
     .catch(error => {
-        console.error('Error al exportar datos:', error);
+        console.error('Error al exportar datos:', error); // **REGISTRO DE ERROR EXISTENTE**
+        console.error("Fetch error details:", error); // **REGISTRO DE DETALLES DEL ERROR**
         alert('Error al exportar datos a Google Sheet.');
     });
+    console.log("fetch call initiated."); // **REGISTRO DESPUÉS DE FETCH**
 });
 
 
