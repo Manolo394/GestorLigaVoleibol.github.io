@@ -1,4 +1,4 @@
---- START OF FILE script.js ---
+
 document.addEventListener('DOMContentLoaded', function() {
     // DOM elements
     const leagueSelect = document.getElementById('leagueSelect');
