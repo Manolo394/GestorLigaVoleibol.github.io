@@ -171,6 +171,8 @@ document.addEventListener('DOMContentLoaded', function() {
         updateLeagueSelect();
         newLeagueName.value = "";
         saveLeagues();
+        leagueSelect.value = leagueName; // Select the newly created league in the dropdown
+        loadLeagueData(leagueName); // Load data for the new league
     });
 
     // Event listener for the delete league button
