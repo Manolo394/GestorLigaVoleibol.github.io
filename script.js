@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // App state variables
     let leagues = {};
     let currentLeague = null;
-    const appsScriptUrl = "https://script.google.com/macros/s/AKfycbyrpyWs10VTuzC0sQcAYpj_XuCLIj3v5D60gH0jYR-4cgSPUtQmD-H2Cn8p6E8yiVF3/exec"; // Replace with your Apps Script URL
+    const appsScriptUrl = "https://script.google.com/macros/s/AKfycbzi326mzgyxmabfj_rUb2B8b8-Zw9Z2Jk9kRKSNLY70cLy-8QBlAodiS99ZdhSP1Tik3w/exec"; // Replace with your Apps Script URL
 
 
     // Load leagues from localStorage
