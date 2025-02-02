@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // App state variables
     let leagues = {};
     let currentLeague = null;
-    const appsScriptUrl = "https://script.google.com/macros/s/AKfycbynF-0Y2SGdiQ40Ma8B6tqRJhSrlpYCkWQsgxcpb0oT7TjgESWwWqJ_Ij41inlgZSb_/exec"; // Replace with your Apps Script URL
+    const appsScriptUrl = "https://script.google.com/macros/s/AKfycby3ldMiXUgDtkiPe281wM_zw08tuAD3D4f1arwY8b-YA0fgZ8fmBvVK4f6RuPpb4W8d/exec"; // Replace with your Apps Script URL
 
 
     // Load leagues from localStorage
@@ -769,34 +769,38 @@ document.addEventListener('DOMContentLoaded', function() {
     matchSelect.addEventListener('change', displayMatchResults);
 
     // Event listener for export data button
-exportDataButton.addEventListener('click', function() {
-    if (!currentLeague) {
-        alert('Por favor, selecciona una liga para exportar datos.');
-        return;
-    }
+    exportDataButton.addEventListener('click', function() {
+        if (!currentLeague) {
+            alert('Por favor, selecciona una liga para exportar datos.');
+            return;
+        }
 
-    const dataToExport = { message: "Prueba de exportación simple", leagueName: leagueSelect.value }; // ¡Datos MUY simples!
-    console.log("exportDataButton clicked. Data to send:", dataToExport); // **REGISTRO ANTES DE FETCH**
+        const dataToExport = {
+            leagueName: leagueSelect.value,
+            competitionType: currentLeague.competitionType,
+            teams: currentLeague.teams,
+            schedule: currentLeague.schedule,
+            matchInfo: currentLeague.matchInfo,
+            results: currentLeague.results
+        };
 
-    fetch(appsScriptUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dataToExport)
-    })
-    .then(response => {
-        console.log("fetch response:", response); // **REGISTRO DE LA RESPUESTA**
-        alert('Datos exportados a Google Sheet exitosamente (verifique la hoja de cálculo).');
-    })
-    .catch(error => {
-        console.error('Error al exportar datos:', error); // **REGISTRO DE ERROR EXISTENTE**
-        console.error("Fetch error details:", error); // **REGISTRO DE DETALLES DEL ERROR**
-        alert('Error al exportar datos a Google Sheet.');
+        fetch(appsScriptUrl, {
+            method: 'POST',
+            mode: 'no-cors', // Avoid CORS issues for simple requests
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dataToExport)
+        })
+        .then(response => {
+            // Since mode is no-cors, response object will be opaque and limited
+             alert('Datos exportados a Google Sheet exitosamente (verifique la hoja de cálculo).');
+        })
+        .catch(error => {
+            console.error('Error al exportar datos:', error);
+            alert('Error al exportar datos a Google Sheet.');
+        });
     });
-    console.log("fetch call initiated."); // **REGISTRO DESPUÉS DE FETCH**
-});
 
 
     // Initialization: Update the league selector
